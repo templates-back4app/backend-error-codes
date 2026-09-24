@@ -1,4 +1,4 @@
-reproduce.sh · 2026-09-24T13:15:17Z · backend user-auth-starter · group auth
+reproduce.sh · 2026-09-24T13:27:39Z · backend user-auth-starter · group auth · client key header X-Parse-JavaScript-Key
 
 #    label (expected code · request · situation)                           HTTP  code  error
 ---  ----------------------------------------------------------------------  ----  ----  -----
@@ -8,7 +8,7 @@ reproduce.sh · 2026-09-24T13:15:17Z · backend user-auth-starter · group auth
 4    403 · GET /classes/_User · right App ID, no key at all                403   -     unauthorized
 5    400 · POST /login · body is not valid JSON                            400   -     Expected double-quoted property name in JSON at position 20
 6    404 · GET /nothing-here · path that does not exist                    404   -     {"message":"Not Found","error":{}}
-7    ok  · POST /users · sign up the probe user probe1170132591            201   -     {"objectId":"fzEuUGqS3M","createdAt":"2026-09-24T13:15:26.506Z","sessionToken":"r:2da0f574
+7    ok  · POST /users · sign up the probe user probe20762507              201   -     {"objectId":"8Kp3SAJHeO","createdAt":"2026-09-24T13:27:47.937Z","sessionToken":"r:8fe4329b
 8    101 · POST /login · right username, wrong password                    404   101   Invalid username/password.
 9    101 · POST /login · username that does not exist                      404   101   Invalid username/password.
 10   101 · GET /classes/_User/xxxxxxxxxx · id that does not exist (master)  404   101   Object not found.
@@ -30,3 +30,4 @@ reproduce.sh · 2026-09-24T13:15:17Z · backend user-auth-starter · group auth
 26   105 · POST /classes/ErrProbe · field name with a space                400   105   Invalid field name: bad key.
 27   103 · GET /classes/bad-name · class name with a hyphen                200   -     {"results":[]}
 28   103 · POST /classes/bad-name · create in a class name with a hyphen   400   107   schema class name does not revalidate
+29   101 · GET /login?username=…&password=wrong · credentials in the query string  404   101   Invalid username/password.

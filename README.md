@@ -2,9 +2,9 @@
 
 [![Deploy on Back4app](https://img.shields.io/badge/Deploy%20on-Back4app-1568B8?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJMMiA3djEwbDEwIDUgMTAtNVY3eiIvPjwvc3ZnPg==)](https://www.back4app.com/signup?utm_source=github&utm_medium=repo&utm_campaign=backend-error-codes)
 
-**One bash script that makes a backend return every error code on purpose, and prints what came back.** `reproduce.sh` fires 47 `curl` requests at a [Back4app](https://www.back4app.com/?utm_source=github&utm_medium=repo&utm_campaign=backend-error-codes) backend (a managed Parse Server) and prints one row per request: the code the article expects, the HTTP status, the numeric `code` in the body and the `error` message. Run it against your own backend and compare.
+**One bash script that makes a backend return every error code on purpose, and prints what came back.** `reproduce.sh` fires 48 `curl` requests at a [Back4app](https://www.back4app.com/?utm_source=github&utm_medium=repo&utm_campaign=backend-error-codes) backend (a managed Parse Server) and prints one row per request: the code the article expects, the HTTP status, the numeric `code` in the body and the `error` message. Run it against your own backend and compare.
 
-Measured on September 24, 2026, on two live backends: **42 error responses, 15 numeric codes** (101, 105, 107, 111, 119, 125, 141, 142, 200, 201, 202, 203, 204, 206, 209) plus the four HTTP-only answers (400, 401, 403, 404). Three runs per backend, identical rows every time; the raw output is in `results/`.
+Measured on September 24, 2026, on two live backends: **43 error responses, 15 numeric codes** (101, 105, 107, 111, 119, 125, 141, 142, 200, 201, 202, 203, 204, 206, 209) plus the four HTTP-only answers (400, 401, 403, 404). Three runs per backend, identical rows every time; the raw output is in `results/`.
 
 > **Read the article:** [Why Does the API Return 101, 119, 142 or 209? Every Backend Error Code, Reproduced](https://www.back4app.com/blog/why-does-the-api-return-101-119-142-or-209?utm_source=github&utm_medium=repo&utm_campaign=backend-error-codes)
 
@@ -41,10 +41,10 @@ Not reproduced, and therefore not in the article: **103** (an invalid class name
 
 ## What is in here
 
-- `reproduce.sh [auth|data|all]` — the 47 requests. `auth` needs any backend with `cloud/main.js` deployed; `data` needs the classes and users from `seed.sh`. Output is the table above, one row per request, with a UTC timestamp in the header.
+- `reproduce.sh [auth|data|all]` — the 48 requests. `auth` needs any backend with `cloud/main.js` deployed; `data` needs the classes and users from `seed.sh`. Output is the table above, one row per request, with a UTC timestamp in the header.
 - `seed.sh` — users `ana` and `bob`, a `moderator` role containing `bob`, a `Note` class whose class-level permissions require a session, and a `Vault` class that allows nobody. Idempotent.
 - `cloud/main.js` — the hooks and functions behind 142, 206, 119, 209 and 141: a `beforeSave` on `_User`, a `beforeSave` on `Note`, `whoami` and `moderatorList`. It is the union of the two files deployed on the backends the article measured.
-- `results/` — the six runs the article quotes (three per backend), unedited.
+- `results/` — the eight runs the article quotes (three per backend with the JavaScript key, one per backend with the Client key), unedited.
 - `.env.example` — the variable names. `.env` is git-ignored; the master key never leaves your machine.
 
 ## Deploy your own

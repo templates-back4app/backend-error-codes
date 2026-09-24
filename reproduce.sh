@@ -74,6 +74,7 @@ if [ "$GROUP" = auth ] || [ "$GROUP" = all ]; then
   probe "105 · POST /classes/ErrProbe · field name with a space"               "${JS[@]}" -X POST "$BASE/classes/ErrProbe" -d '{"bad key":1}'
   probe "103 · GET /classes/bad-name · class name with a hyphen"               "${JS[@]}" "$BASE/classes/bad-name"
   probe "103 · POST /classes/bad-name · create in a class name with a hyphen"  "${JS[@]}" -X POST "$BASE/classes/bad-name" -d '{"x":1}'
+  probe "101 · GET /login?username=…&password=wrong · credentials in the query string" "${JS[@]}" "$BASE/login?username=$U&password=wrong"
   # tidy up: the probe user, and the empty class the rejected 105 create left behind
   [ -n "$UID_" ] && curl -s -o /dev/null "${MK[@]}" -X DELETE "$BASE/users/$UID_"
   curl -s -o /dev/null "${MK[@]}" -X DELETE "$BASE/schemas/ErrProbe"
