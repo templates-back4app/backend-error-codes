@@ -1,0 +1,32 @@
+reproduce.sh · 2026-09-24T13:15:17Z · backend user-auth-starter · group auth
+
+#    label (expected code · request · situation)                           HTTP  code  error
+---  ----------------------------------------------------------------------  ----  ----  -----
+1    401 · GET /classes/_User · no X-Parse-Application-Id header           401   -     unauthorized
+2    401 · GET /classes/_User · App ID that does not exist                 401   -     unauthorized
+3    403 · GET /classes/_User · right App ID, wrong JavaScript key         403   -     unauthorized
+4    403 · GET /classes/_User · right App ID, no key at all                403   -     unauthorized
+5    400 · POST /login · body is not valid JSON                            400   -     Expected double-quoted property name in JSON at position 20
+6    404 · GET /nothing-here · path that does not exist                    404   -     {"message":"Not Found","error":{}}
+7    ok  · POST /users · sign up the probe user probe1170132591            201   -     {"objectId":"fzEuUGqS3M","createdAt":"2026-09-24T13:15:26.506Z","sessionToken":"r:2da0f574
+8    101 · POST /login · right username, wrong password                    404   101   Invalid username/password.
+9    101 · POST /login · username that does not exist                      404   101   Invalid username/password.
+10   101 · GET /classes/_User/xxxxxxxxxx · id that does not exist (master)  404   101   Object not found.
+11   202 · POST /users · same username again                               400   202   Account already exists for this username.
+12   203 · POST /users · new username, same e-mail                         400   203   Account already exists for this email address.
+13   142 · POST /users · username "ab" (beforeSave hook wants 3+)          400   142   username needs at least 3 characters.
+14   200 · POST /users · no username                                       400   200   bad or missing username
+15   201 · POST /users · no password                                       400   201   password is required
+16   125 · POST /users · e-mail "not-an-email"                             400   125   Email address format is invalid.
+17   200 · POST /login · empty body                                        400   200   username/email is required.
+18   204 · POST /requestPasswordReset · no e-mail                          400   204   you must provide an email
+19   205 · POST /requestPasswordReset · e-mail nobody has (docs say 205)   200   -     {}
+20   209 · GET /users/me · made-up session token                           400   209   Invalid session token
+21   209 · GET /users/me · no session token at all                         400   209   Invalid session token
+22   209 · POST /functions/whoami · no session token                       400   209   log in first.
+23   ok  · POST /logout · probe user                                       200   -     {}
+24   209 · GET /users/me · the token that just logged out                  400   209   Invalid session token
+25   141 · POST /functions/doesNotExist · function not defined             400   141   Invalid function: "doesNotExist"
+26   105 · POST /classes/ErrProbe · field name with a space                400   105   Invalid field name: bad key.
+27   103 · GET /classes/bad-name · class name with a hyphen                200   -     {"results":[]}
+28   103 · POST /classes/bad-name · create in a class name with a hyphen   400   107   schema class name does not revalidate

@@ -1,0 +1,23 @@
+reproduce.sh · 2026-09-24T13:13:19Z · backend lockdown-lab · group data
+
+#    label (expected code · request · situation)                           HTTP  code  error
+---  ----------------------------------------------------------------------  ----  ----  -----
+1    101 · GET /classes/Note · anonymous, CLP requires a session           404   101   Permission denied, user needs to be authenticated.
+2    101 · POST /classes/Note · anonymous, CLP requires a session          404   101   Permission denied, user needs to be authenticated.
+3    101 · GET /classes/Note/xxxxxxxxxx · anonymous, id does not exist     404   101   Permission denied, user needs to be authenticated.
+4    101 · GET /classes/Note/xxxxxxxxxx · ana, id does not exist           404   101   Object not found.
+5    119 · GET /classes/Note?count=1 · anonymous                           400   119   Permission denied for action count on class Note.
+6    119 · GET /classes/Note?count=1 · ana (CLP has no count entry)        400   119   Permission denied for action count on class Note.
+7    ok  · POST /classes/Note · ana creates a note (hook stamps her ACL)   201   -     {"objectId":"8NVepkE5q5","createdAt":"2026-09-24T13:13:30.867Z","ACL":{"EBkE7EJ1sb":{"read
+8    101 · GET /classes/Note/<ana's note> · bob (ACL hides the row)        404   101   Object not found.
+9    101 · PUT /classes/Note/<ana's note> · bob (ACL hides the row)        404   101   Object not found.
+10   ok  · GET /classes/Note/<ana's note> · ana reads her own note         200   -     {"objectId":"8NVepkE5q5","text":"ana private","owner":{"__type":"Pointer","className":"_Us
+11   119 · GET /classes/Vault · ana, CLP allows nobody                     400   119   Permission denied for action find on class Vault.
+12   119 · GET /classes/Vault · anonymous, CLP allows nobody               400   119   Permission denied for action find on class Vault.
+13   119 · POST /classes/Vault · ana, CLP allows nobody                    400   119   Permission denied for action create on class Vault.
+14   119 · POST /functions/moderatorList · ana is not a moderator          400   119   moderators only.
+15   209 · POST /functions/moderatorList · no session token                400   209   log in first.
+16   ok  · POST /functions/moderatorList · bob is a moderator              200   -     {"result":[{"id":"RpQpVD92t6","text":"edited by bob","owner":"EBkE7EJ1sb"},{"id":"ss6GcW5D
+17   206 · POST /classes/Note · master key, no session (hook needs a user)  400   206   log in to create a note.
+18   141 · POST /classes/Note · master key, owner is a plain object (hook throws)  400   141   Tried to create an ACL with an invalid permission type.
+19   111 · POST /classes/Note · ana, text is a number not a string         400   111   schema mismatch for Note.text; expected String but got Number
