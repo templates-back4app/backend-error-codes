@@ -10,12 +10,14 @@ set -uo pipefail
 GROUP="${1:-all}"
 BASE="${BASE:-https://parseapi.back4app.com}"
 ANA_PASS="${ANA_PASS:-ana-pass-2026}"; BOB_PASS="${BOB_PASS:-bob-pass-2026}"
+# any client key works: KEY_HEADER=X-Parse-Client-Key KEY_VALUE=$CLIENT_KEY ./reproduce.sh gives the same rows (measured)
+KEY_HEADER="${KEY_HEADER:-X-Parse-JavaScript-Key}"; KEY_VALUE="${KEY_VALUE:-$JS_KEY}"
 APP=(-H "X-Parse-Application-Id: $APP_ID" -H "Content-Type: application/json")
-JS=("${APP[@]}" -H "X-Parse-JavaScript-Key: $JS_KEY" -H "X-Parse-Revocable-Session: 1")
+JS=("${APP[@]}" -H "$KEY_HEADER: $KEY_VALUE" -H "X-Parse-Revocable-Session: 1")
 MK=("${APP[@]}" -H "X-Parse-Master-Key: $MASTER_KEY")
 BODY=$(mktemp); trap 'rm -f "$BODY"' EXIT
 RUN=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-printf 'reproduce.sh · %s · backend %s · group %s\n\n' "$RUN" "${BACKEND_LABEL:-unnamed}" "$GROUP"
+printf 'reproduce.sh · %s · backend %s · group %s · client key header %s\n\n' "$RUN" "${BACKEND_LABEL:-unnamed}" "$GROUP" "$KEY_HEADER"
 printf '%-3s  %-70s  %-4s  %-4s  %s\n' "#" "label (expected code · request · situation)" "HTTP" "code" "error"
 printf '%-3s  %-70s  %-4s  %-4s  %s\n' "---" "----------------------------------------------------------------------" "----" "----" "-----"
 n=0
@@ -44,8 +46,8 @@ login() { curl -s "${JS[@]}" -X POST "$BASE/login" -d "{\"username\":\"$1\",\"pa
 if [ "$GROUP" = auth ] || [ "$GROUP" = all ]; then
   U="probe$RANDOM$RANDOM"; PW="Probe-pass-2026"
   probe "401 · GET /classes/_User · no X-Parse-Application-Id header"          -H "Content-Type: application/json" "$BASE/classes/_User"
-  probe "401 · GET /classes/_User · App ID that does not exist"                -H "X-Parse-Application-Id: not-an-app-id" -H "X-Parse-JavaScript-Key: $JS_KEY" "$BASE/classes/_User"
-  probe "403 · GET /classes/_User · right App ID, wrong JavaScript key"        "${APP[@]}" -H "X-Parse-JavaScript-Key: not-the-key" "$BASE/classes/_User"
+  probe "401 · GET /classes/_User · App ID that does not exist"                -H "X-Parse-Application-Id: not-an-app-id" -H "$KEY_HEADER: $KEY_VALUE" "$BASE/classes/_User"
+  probe "403 · GET /classes/_User · right App ID, wrong JavaScript key"        "${APP[@]}" -H "$KEY_HEADER: not-the-key" "$BASE/classes/_User"
   probe "403 · GET /classes/_User · right App ID, no key at all"               "${APP[@]}" "$BASE/classes/_User"
   probe "400 · POST /login · body is not valid JSON"                           "${JS[@]}" -X POST "$BASE/login" -d '{"username": "ana", '
   probe "404 · GET /nothing-here · path that does not exist"                   "${JS[@]}" "$BASE/nothing-here"
